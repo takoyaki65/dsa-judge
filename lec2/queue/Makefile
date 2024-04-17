@@ -1,4 +1,4 @@
-BINARIES = queue_test link_test test_push_pop
+BINARIES = queue_test link_test test_push_pop test_underflow_sanitizer
 
 link_test: main_queue.o queue.o
 	$(CC) $(CFLAGS) -o $@ $^

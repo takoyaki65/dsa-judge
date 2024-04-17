@@ -6,5 +6,8 @@ link_test: main_queue.o queue.o
 test_push_pop: test_push_pop.o test_queue.o queue.o
 	g++ $(CFLAGS) -o $@ $^
 
+test_underflow_sanitizer: test_underflow_sanitizer.o test_queue.o queue.o
+	g++ $(CFLAGS) -o $@ $^
+
 clean:
 	rm -f *.o $(BINARIES) *.txt

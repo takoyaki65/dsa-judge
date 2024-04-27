@@ -22,4 +22,4 @@ test_ReadFromFile: test_ReadFromFile.o doublylinked_list.o test_doublylinked_lis
 	g++ $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f *.o $(BINARIES) *.txt
+	rm -f *.o $(BINARIES)

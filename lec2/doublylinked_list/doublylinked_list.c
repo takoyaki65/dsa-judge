@@ -28,7 +28,7 @@ void InsertPrev(Cell *this_cell, Cell *p) {
 void DeleteCell(Cell *this_cell) {
   if (!this_cell->is_head && this_cell->next == this_cell &&
       this_cell->prev == this_cell) {
-    fprintf(stderr, "This cell is not connected to any other cells.\n");
+    fprintf(stderr, "This cell is not connected.\n");
   }
   this_cell->prev->next = this_cell->next;
   this_cell->next->prev = this_cell->prev;

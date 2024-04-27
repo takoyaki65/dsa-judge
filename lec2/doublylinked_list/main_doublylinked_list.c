@@ -1,8 +1,12 @@
-#include <stdlib.h>
 #include "doublylinked_list.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(void) {
   Cell *head = CreateCell(0, true);
+  printf("head: %p(d: %d, next: %p, prev: %p, is_head: %s)\n", head, head->data,
+         head->next, head->prev, head->is_head ? "true" : "false");
+
   Cell *elem;
 
   InsertNext(head, CreateCell(2, false));

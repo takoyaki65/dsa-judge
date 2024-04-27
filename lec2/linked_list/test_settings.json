@@ -1,0 +1,102 @@
+[
+  {
+    "name": "link_test",
+    "compileCommand": [
+      "make link_test"
+    ],
+    "runCommand": [
+      "./link_test"
+    ],
+    "testCases": [
+      {
+        "type": "inline",
+        "input": "",
+        "expectedOutput": "1 2 3\n1 3\n3",
+        "expectedStderr": ""
+      }
+    ],
+    "timeOut": 1,
+    "memoryLimit": 32,
+    "memoryLeakCheck": false
+  },
+  {
+    "name": "test_insert_cell_top",
+    "compileCommand": [
+      "make test_insert_cell_top"
+    ],
+    "runCommand": [
+      "./test_insert_cell_top"
+    ],
+    "testCases": [
+      {
+        "type": "inline",
+        "input": "",
+        "expectedOutput": "PASS\n",
+        "expectedStderr": ""
+      }
+    ],
+    "timeOut": 1,
+    "memoryLimit": 32,
+    "memoryLeakCheck": false
+  },
+  {
+    "name": "test_insert_cell",
+    "compileCommand": [
+      "make test_insert_cell"
+    ],
+    "runCommand": [
+      "./test_insert_cell"
+    ],
+    "testCases": [
+      {
+        "type": "inline",
+        "input": "",
+        "expectedOutput": "PASS\n",
+        "expectedStderr": ""
+      }
+    ],
+    "timeOut": 1,
+    "memoryLimit": 32,
+    "memoryLeakCheck": false
+  },
+  {
+    "name": "test_delete_cell_top",
+    "compileCommand": [
+      "make test_delete_cell_top"
+    ],
+    "runCommand": [
+      "./test_delete_cell_top"
+    ],
+    "testCases": [
+      {
+        "type": "inline",
+        "input": "",
+        "expectedOutput": "PASS\n",
+        "expectedStderr": ""
+      }
+    ],
+    "timeOut": 1,
+    "memoryLimit": 32,
+    "memoryLeakCheck": true
+  },
+  {
+    "name": "test_delete_cell",
+    "compileCommand": [
+      "make test_delete_cell"
+    ],
+    "runCommand": [
+      "./test_delete_cell"
+    ],
+    "testCases": [
+      {
+        "type": "inline",
+        "input": "",
+        "expectedOutput": "PASS\n",
+        "expectedStderr": ""
+      }
+    ],
+    "timeOut": 1,
+    "memoryLimit": 32,
+    "memoryLeakCheck": true
+  }
+]

@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "compileCommand": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "runCommand": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "testCases": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "inline",
+                "file"
+              ]
+            },
+            "input": {
+              "type": "string"
+            },
+            "expectedOutput": {
+              "type": "string"
+            },
+            "expectedStderr": {
+              "type": "string"
+            },
+            "inputFile": {
+              "type": "string"
+            },
+            "outputFile": {
+              "type": "string"
+            },
+            "stderrFile": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "oneOf": [
+            {
+              "required": [
+                "input",
+                "expectedOutput",
+                "expectedStderr"
+              ]
+            },
+            {
+              "required": [
+                "inputFile",
+                "outputFile",
+                "stderrFile"
+              ]
+            }
+          ]
+        }
+      },
+      "timeOut": {
+        "type": "integer"
+      },
+      "memoryLimit": {
+        "type": "integer"
+      },
+      "memoryLeakCheck": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "compileCommand",
+      "runCommand",
+      "testCases",
+      "timeOut",
+      "memoryLimit",
+      "memoryLeakCheck"
+    ],
+    "additionalProperties": false
+  }
+}

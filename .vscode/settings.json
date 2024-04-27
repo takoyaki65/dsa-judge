@@ -1,0 +1,10 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "**/*test_settings.json"
+      ],
+      "url": "./schema.json"
+    }
+  ]
+}

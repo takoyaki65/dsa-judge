@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <ratio>
 #include <string>
 #include <sys/resource.h>
 #include <sys/wait.h>
@@ -18,6 +19,7 @@ void print_usage_stats(const rusage &rusage) {
             << std::endl;
 }
 
+// /proc/$pid/statusからメモリ使用量を取得
 int get_memory(pid_t pid) {
   char path[256];
   snprintf(path, 255, "/proc/%d/status", pid);
@@ -45,20 +47,20 @@ int get_memory(pid_t pid) {
 
 int main(int argc, char *argv[]) {
   int opt;
-  int timeout = 1;
+  int timeout_ms = 1000;
   int max_memory = 32 * 1024;
 
   while ((opt = getopt(argc, argv, "t:m:")) != -1) {
     switch (opt) {
     case 't':
-      timeout = atoi(optarg);
+      timeout_ms = atoi(optarg);
       break;
     case 'm':
       max_memory = atoi(optarg) * 1024; // Convert MB to KB
       break;
     default:
       std::cerr << "Usage: " << argv[0]
-                << " [-t timeout] [-m max_memory_mb] <command> [args...]"
+                << " [-t timeout_ms] [-m max_memory_mb] <command> [args...]"
                 << std::endl;
       return 1;
     }
@@ -66,12 +68,12 @@ int main(int argc, char *argv[]) {
 
   if (optind >= argc) {
     std::cerr << "Usage: " << argv[0]
-              << " [-t timeout] [-m max_memory_mb] <command> [args...]"
+              << " [-t timeout_ms] [-m max_memory_mb] <command> [args...]"
               << std::endl;
     return 1;
   }
 
-  printf("timeout: %d\n", timeout);
+  printf("timeout: %d\n", timeout_ms);
   printf("max_memory: %d\n", max_memory);
 
   pid_t pid = fork();
@@ -110,40 +112,41 @@ int main(int argc, char *argv[]) {
         int memory = get_memory(pid);
 
         // Check timeout
-        if (timeout > 0) {
-          auto end = std::chrono::steady_clock::now();
-          auto elapsed =
-              std::chrono::duration_cast<std::chrono::seconds>(end - start)
-                  .count();
-          // printf("elapsed: %ld\n", elapsed);
-          if (elapsed >= timeout) {
-            std::cout << "Timeout limit exceeded." << std::endl;
-            kill(pid, SIGTERM);
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            if (waitpid(pid, nullptr, WNOHANG) == 0) {
-              std::cout << "Killing process." << std::endl;
-              kill(pid, SIGKILL);
-            }
-            getrusage(RUSAGE_CHILDREN, &usage);
-            print_usage_stats(usage);
-            break;
+        auto end = std::chrono::steady_clock::now();
+        auto elapsed =
+            std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+                .count();
+        // printf("elapsed: %ld\n", elapsed);
+        if (elapsed >= timeout_ms) {
+          std::cout << "Timeout limit exceeded." << std::endl;
+          kill(pid, SIGTERM);
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          if (waitpid(pid, nullptr, WNOHANG) == 0) {
+            std::cout << "Killing process." << std::endl;
+            kill(pid, SIGKILL);
           }
+          getrusage(RUSAGE_CHILDREN, &usage);
+          print_usage_stats(usage);
+          break;
         }
 
         // Check memory limit
         if (max_memory > 0 && memory > max_memory) {
           std::cout << "Memory limit exceeded." << std::endl;
-          kill(pid, SIGKILL);
+          kill(pid, SIGTERM);
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          if (waitpid(pid, nullptr, WNOHANG) == 0) {
+            std::cout << "Killing process." << std::endl;
+            kill(pid, SIGKILL);
+          }
           getrusage(RUSAGE_CHILDREN, &usage);
-          usage.ru_maxrss = memory;
+          // usage.ru_maxrss = memory;
+          // usage.ru_utime.tv_sec = elapsed / 1000;
+          // usage.ru_utime.tv_usec = (elapsed % 1000) * 1000;
           print_usage_stats(usage);
           break;
         }
 
-        auto end = std::chrono::steady_clock::now();
-        auto elapsed =
-            std::chrono::duration_cast<std::chrono::seconds>(end - start)
-                .count();
         if (elapsed >= 1) {
           std::this_thread::sleep_for(std::chrono::seconds(1));
         } else {

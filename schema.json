@@ -13,6 +13,15 @@
           "type": "string"
         }
       },
+      "mainSourceFile": {
+        "type": "string"
+      },
+      "associatedFiles": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
       "runCommand": {
         "type": "array",
         "items": {
@@ -84,6 +93,7 @@
     "required": [
       "name",
       "compileCommand",
+      "mainSourceFile",
       "runCommand",
       "testCases",
       "timeOut",

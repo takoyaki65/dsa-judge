@@ -4,6 +4,11 @@
     "compileCommand": [
       "make link_test"
     ],
+    "mainSourceFile": "main_linked_list.c",
+    "associatedFiles": [
+      "linked_list.c",
+      "linked_list.h"
+    ],
     "runCommand": [
       "./link_test"
     ],
@@ -23,6 +28,13 @@
     "name": "test_insert_cell_top",
     "compileCommand": [
       "make test_insert_cell_top"
+    ],
+    "mainSourceFile": "test_insert_cell_top.cpp",
+    "associatedFiles": [
+      "linked_list.c",
+      "linked_list.h",
+      "test_linked_list.hpp",
+      "test_linked_list.cpp"
     ],
     "runCommand": [
       "./test_insert_cell_top"
@@ -44,6 +56,13 @@
     "compileCommand": [
       "make test_insert_cell"
     ],
+    "mainSourceFile": "test_insert_cell.cpp",
+    "associatedFiles": [
+      "linked_list.c",
+      "linked_list.h",
+      "test_linked_list.hpp",
+      "test_linked_list.cpp"
+    ],
     "runCommand": [
       "./test_insert_cell"
     ],
@@ -64,6 +83,13 @@
     "compileCommand": [
       "make test_delete_cell_top"
     ],
+    "mainSourceFile": "test_delete_cell_top.cpp",
+    "associatedFiles": [
+      "linked_list.c",
+      "linked_list.h",
+      "test_linked_list.hpp",
+      "test_linked_list.cpp"
+    ],
     "runCommand": [
       "./test_delete_cell_top"
     ],
@@ -83,6 +109,13 @@
     "name": "test_delete_cell",
     "compileCommand": [
       "make test_delete_cell"
+    ],
+    "mainSourceFile": "test_delete_cell.cpp",
+    "associatedFiles": [
+      "linked_list.c",
+      "linked_list.h",
+      "test_linked_list.hpp",
+      "test_linked_list.cpp"
     ],
     "runCommand": [
       "./test_delete_cell"

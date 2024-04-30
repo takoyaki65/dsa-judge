@@ -1,9 +1,8 @@
-import psutil
 import time
 import subprocess
 import resource
 from enum import Enum
-
+import psutil
 
 class TracedProcState(Enum):
     NOT_STARTED = 0
@@ -67,21 +66,19 @@ class ProcessTracer:
         try:
             while self.process.is_running():
                 try:
-                    print("Waiting for process to finish")
-                    self.exitcode = self.process.wait(timeout=1)
-                except psutil.TimeoutExpired:
-                    pass
-                
-                if self.exitcode is not None:
+                    # print("Waiting for process to finish")
+                    self.exitcode = self.process.wait(timeout=0.5)
+                    # If TimoutExpired is not raised, the process has finished
                     break
+                except psutil.TimeoutExpired:
+                    # print("Process is still running")
+                    pass
 
                 # Check timeout
-                elapsed: float = time.time() - self.process.create_time()
-                print(f"Elapsed time: {elapsed}")
                 cpu_times = self.process.cpu_times()
                 self.exec_time_ms = (
-                    cpu_times.user + cpu_times.system + cpu_times.iowait # in seconds
-                ) * 1000 # in milliseconds
+                    cpu_times.user + cpu_times.system + cpu_times.iowait  # in seconds
+                ) * 1000  # in milliseconds
                 print(f"Execution time: {self.exec_time_ms}")
                 if self.exec_time_ms > self.timeout_ms:
                     self.process.terminate()
@@ -102,15 +99,13 @@ class ProcessTracer:
                         f"Process exceeded memory limit of {self.max_memory_mb} MB"
                     )
 
-    
             usage = resource.getrusage(resource.RUSAGE_CHILDREN)
             self.max_memory_used_mb = max(
                 self.max_memory_used_mb, usage.ru_maxrss / 1024.0
             )
             self.stdout_data, self.stderr_data = self.process.communicate()
             self.exec_time_ms = (usage.ru_utime + usage.ru_stime) * 1000
-            self.stdout_data, self.stderr_data = self.process.communicate()
-
+        
         except (TimeoutError, MemoryError):
             self.process.terminate()
             self.exitcode = self.process.wait()

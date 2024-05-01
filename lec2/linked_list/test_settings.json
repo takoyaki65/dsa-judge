@@ -28,7 +28,7 @@
     "compileCommand": [
       "make test_insert_cell_top"
     ],
-    "mainSourceFile": "testcase/test_insert_cell_top.cpp",
+    "mainSourceFile": "test_insert_cell_top.cpp",
     "associatedFiles": [
       "linked_list.c",
       "linked_list.h",

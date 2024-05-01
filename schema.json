@@ -33,50 +33,29 @@
         "items": {
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "enum": [
-                "inline",
-                "file"
+            "inputFile": {
+              "type": [
+                "string",
+                "null"
               ]
             },
-            "input": {
-              "type": "string"
-            },
-            "expectedOutput": {
-              "type": "string"
-            },
-            "expectedStderr": {
-              "type": "string"
-            },
-            "inputFile": {
-              "type": "string"
-            },
             "outputFile": {
-              "type": "string"
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "stderrFile": {
-              "type": "string"
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "required": [
-            "type"
-          ],
-          "oneOf": [
-            {
-              "required": [
-                "input",
-                "expectedOutput",
-                "expectedStderr"
-              ]
-            },
-            {
-              "required": [
-                "inputFile",
-                "outputFile",
-                "stderrFile"
-              ]
-            }
+            "inputFile",
+            "outputFile",
+            "stderrFile"
           ]
         }
       },

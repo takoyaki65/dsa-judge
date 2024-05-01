@@ -14,10 +14,9 @@
     ],
     "testCases": [
       {
-        "type": "inline",
-        "input": "",
-        "expectedOutput": "1 2 3\n1 3\n3",
-        "expectedStderr": ""
+        "inputFile": null,
+        "outputFile": "testcase/link_test.out",
+        "stderrFile": null
       }
     ],
     "timeOut": 1,
@@ -29,7 +28,7 @@
     "compileCommand": [
       "make test_insert_cell_top"
     ],
-    "mainSourceFile": "test_insert_cell_top.cpp",
+    "mainSourceFile": "testcase/test_insert_cell_top.cpp",
     "associatedFiles": [
       "linked_list.c",
       "linked_list.h",
@@ -41,10 +40,9 @@
     ],
     "testCases": [
       {
-        "type": "inline",
-        "input": "",
-        "expectedOutput": "PASS\n",
-        "expectedStderr": ""
+        "inputFile": null,
+        "outputFile": "testcase/test_insert_cell_top.out",
+        "stderrFile": null
       }
     ],
     "timeOut": 1,
@@ -68,10 +66,9 @@
     ],
     "testCases": [
       {
-        "type": "inline",
-        "input": "",
-        "expectedOutput": "PASS\n",
-        "expectedStderr": ""
+        "inputFile": null,
+        "outputFile": "testcase/test_insert_cell.out",
+        "stderrFile": null
       }
     ],
     "timeOut": 1,
@@ -95,10 +92,9 @@
     ],
     "testCases": [
       {
-        "type": "inline",
-        "input": "",
-        "expectedOutput": "PASS\n",
-        "expectedStderr": ""
+        "inputFile": null,
+        "outputFile": "testcase/test_delete_cell_top.out",
+        "stderrFile": null
       }
     ],
     "timeOut": 1,
@@ -122,10 +118,9 @@
     ],
     "testCases": [
       {
-        "type": "inline",
-        "input": "",
-        "expectedOutput": "PASS\n",
-        "expectedStderr": ""
+        "inputFile": null,
+        "outputFile": "testcase/test_delete_cell.out",
+        "stderrFile": null
       }
     ],
     "timeOut": 1,

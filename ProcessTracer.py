@@ -67,7 +67,7 @@ class ProcessTracer:
             while self.process.is_running():
                 try:
                     # print("Waiting for process to finish")
-                    self.exitcode = self.process.wait(timeout=0.5)
+                    self.exitcode = self.process.wait(timeout=self.timeout_ms / 10.0)
                     # If TimoutExpired is not raised, the process has finished
                     break
                 except psutil.TimeoutExpired:

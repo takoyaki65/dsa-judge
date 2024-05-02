@@ -1,7 +1,7 @@
 # usage: python3 ProcessTracerCmd.py <timeout_ms> <max_memory_mb> <path_to_executable> <args>
 
 import sys
-import ProcessTracer
+from . import ProcessTracer
 import subprocess
 
 if __name__ == "__main__":

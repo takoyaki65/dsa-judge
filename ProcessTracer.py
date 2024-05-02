@@ -79,7 +79,7 @@ class ProcessTracer:
                 self.exec_time_ms = (
                     cpu_times.user + cpu_times.system + cpu_times.iowait  # in seconds
                 ) * 1000  # in milliseconds
-                print(f"Execution time: {self.exec_time_ms}")
+                # print(f"Execution time: {self.exec_time_ms}")
                 if self.exec_time_ms > self.timeout_ms:
                     self.process.terminate()
                     self.status = TracedProcState.TIMEOUT
@@ -91,7 +91,7 @@ class ProcessTracer:
                 memory_info: psutil.Process.memory_info = self.process.memory_info()
                 memory_used_mb: float = memory_info.rss / 1024.0 / 1024.0
                 self.max_memory_used_mb = max(memory_used_mb, self.max_memory_used_mb)
-                print(f"Memory used: {self.max_memory_used_mb}")
+                # print(f"Memory used: {self.max_memory_used_mb}")
                 if self.max_memory_used_mb > self.max_memory_mb:
                     self.process.terminate()
                     self.status = TracedProcState.MEMORY_ERROR

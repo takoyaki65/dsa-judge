@@ -1,4 +1,8 @@
 {
+  "requiredSourceFiles": [
+    "linked_list.c",
+    "linked_list.h"
+  ],
   "lightTestList": [
     {
       "name": "link_test",
@@ -10,9 +14,7 @@
         "linked_list.c",
         "linked_list.h"
       ],
-      "runCommand": [
-        "./link_test"
-      ],
+      "executable": "link_test",
       "testCases": [
         {
           "inputFile": null,
@@ -38,9 +40,7 @@
         "test_linked_list.hpp",
         "test_linked_list.cpp"
       ],
-      "runCommand": [
-        "./test_insert_cell_top"
-      ],
+      "executable": "test_insert_cell_top",
       "testCases": [
         {
           "inputFile": null,
@@ -64,9 +64,7 @@
         "test_linked_list.hpp",
         "test_linked_list.cpp"
       ],
-      "runCommand": [
-        "./test_insert_cell"
-      ],
+      "executable": "test_insert_cell",
       "testCases": [
         {
           "inputFile": null,
@@ -90,9 +88,7 @@
         "test_linked_list.hpp",
         "test_linked_list.cpp"
       ],
-      "runCommand": [
-        "./test_delete_cell_top"
-      ],
+      "executable": "test_delete_cell_top",
       "testCases": [
         {
           "inputFile": null,
@@ -116,9 +112,7 @@
         "test_linked_list.hpp",
         "test_linked_list.cpp"
       ],
-      "runCommand": [
-        "./test_delete_cell"
-      ],
+      "executable": "test_delete_cell",
       "testCases": [
         {
           "inputFile": null,

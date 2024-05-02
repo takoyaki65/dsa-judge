@@ -1,4 +1,7 @@
-import time
+"""
+module for tracing and monitoring the execution of a process.
+"""
+
 import subprocess
 import resource
 from enum import Enum
@@ -44,17 +47,17 @@ class ProcessTracer:
         exitcode (int): The exit code of the process.
     """
 
-    timeout_ms: int = 1000
-    max_memory_mb: int = 100
-    stdout_data: str = b""
-    stderr_data: str = b""
-    exec_time_ms: int = 0
-    max_memory_used_mb: int = 0
-    pathname: str = ""
-    args: list[str] = []
-    process: psutil.Popen = None
-    status: TracedProcState = TracedProcState.NOT_STARTED
-    exitcode: int = 0
+    _timeout_ms: int = 1000
+    _max_memory_mb: int = 100
+    _stdout_data: str = b""
+    _stderr_data: str = b""
+    _exec_time_ms: float = 0
+    _max_memory_used_mb: float = 0
+    _pathname: str = ""
+    _args: list[str] = []
+    _process: psutil.Popen = None
+    _status: TracedProcState = TracedProcState.NOT_STARTED
+    _exitcode: int = 0
 
     def __init__(
         self,
@@ -72,10 +75,10 @@ class ProcessTracer:
             timeout_ms (int): The timeout value in milliseconds (default: 1000).
             max_memory_mb (int): The maximum memory limit in megabytes (default: 100).
         """
-        self.pathname = pathname
-        self.args = args
-        self.timeout_ms = timeout_ms
-        self.max_memory_mb = max_memory_mb
+        self._pathname = pathname
+        self._args = args
+        self._timeout_ms = timeout_ms
+        self._max_memory_mb = max_memory_mb
 
     def spawn(self) -> None:
         """
@@ -93,20 +96,20 @@ class ProcessTracer:
         Returns:
             None
         """
-        print(f"timeout: {self.timeout_ms}")
-        print(f"max_memory: {self.max_memory_mb}")
-        print(f"pathname: {self.pathname}")
-        print(f"args: {self.args}")
-        self.process = psutil.Popen(
-            [self.pathname] + self.args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        # print(f"timeout: {self._timeout_ms}")
+        # print(f"max_memory: {self._max_memory_mb}")
+        # print(f"pathname: {self._pathname}")
+        # print(f"args: {self._args}")
+        self._process = psutil.Popen(
+            [self._pathname] + self._args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
-        self.status = TracedProcState.RUNNING
+        self._status = TracedProcState.RUNNING
 
         try:
-            while self.process.is_running():
+            while self._process.is_running():
                 try:
                     # print("Waiting for process to finish")
-                    self.exitcode = self.process.wait(timeout=self.timeout_ms / 10.0)
+                    self._exitcode = self._process.wait(timeout=self._timeout_ms / 10.0)
                     # If TimoutExpired is not raised, the process has finished
                     break
                 except psutil.TimeoutExpired:
@@ -114,53 +117,55 @@ class ProcessTracer:
                     pass
 
                 # Check timeout
-                cpu_times = self.process.cpu_times()
-                self.exec_time_ms = (
+                cpu_times = self._process.cpu_times()
+                self._exec_time_ms = (
                     cpu_times.user + cpu_times.system + cpu_times.iowait  # in seconds
                 ) * 1000  # in milliseconds
                 # print(f"Execution time: {self.exec_time_ms}")
-                if self.exec_time_ms > self.timeout_ms:
-                    self.process.terminate()
-                    self.status = TracedProcState.TIMEOUT
+                if self._exec_time_ms > self._timeout_ms:
+                    self._process.terminate()
+                    self._status = TracedProcState.TIMEOUT
                     raise TimeoutError(
-                        f"Process exceeded timeout of {self.timeout_ms} ms"
+                        f"Process exceeded timeout of {self._timeout_ms} ms"
                     )
 
                 # Check memory usage
-                memory_info: psutil.Process.memory_info = self.process.memory_info()
+                memory_info: psutil.Process.memory_info = self._process.memory_info()
                 memory_used_mb: float = memory_info.rss / 1024.0 / 1024.0
-                self.max_memory_used_mb = max(memory_used_mb, self.max_memory_used_mb)
+                self._max_memory_used_mb = max(memory_used_mb, self._max_memory_used_mb)
                 # print(f"Memory used: {self.max_memory_used_mb}")
-                if self.max_memory_used_mb > self.max_memory_mb:
-                    self.process.terminate()
-                    self.status = TracedProcState.MEMORY_ERROR
+                if self._max_memory_used_mb > self._max_memory_mb:
+                    self._process.terminate()
+                    self._status = TracedProcState.MEMORY_ERROR
                     raise MemoryError(
-                        f"Process exceeded memory limit of {self.max_memory_mb} MB"
+                        f"Process exceeded memory limit of {self._max_memory_mb} MB"
                     )
 
             usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-            self.max_memory_used_mb = max(
-                self.max_memory_used_mb, usage.ru_maxrss / 1024.0
+            self._max_memory_used_mb = max(
+                self._max_memory_used_mb, usage.ru_maxrss / 1024.0
             )
-            self.stdout_data, self.stderr_data = self.process.communicate()
-            self.exec_time_ms = (usage.ru_utime + usage.ru_stime) * 1000
+            self._stdout_data, self._stderr_data = self._process.communicate()
+            self._exec_time_ms = (usage.ru_utime + usage.ru_stime) * 1000
 
         except (TimeoutError, MemoryError):
-            self.process.terminate()
-            self.exitcode = self.process.wait()
-            self.stdout_data, self.stderr_data = self.process.communicate()
+            self._process.terminate()
+            self._exitcode = self._process.wait()
+            self._stdout_data, self._stderr_data = self._process.communicate()
             raise
 
-        if self.exitcode != 0:
-            self.status = TracedProcState.EXEC_ERROR
+        if self._exitcode != 0:
+            self._status = TracedProcState.EXEC_ERROR
             raise subprocess.CalledProcessError(
-                self.exitcode,
-                self.pathname,
-                output=self.stdout_data,
-                stderr=self.stderr_data,
+                self._exitcode,
+                self._pathname,
+                output=self._stdout_data,
+                stderr=self._stderr_data,
             )
-        if self.exitcode == 0:
-            self.status = TracedProcState.SUCCESS
+        if self._exitcode == 0:
+            self._status = TracedProcState.SUCCESS
+            if self._max_memory_used_mb > self._max_memory_mb:
+                self._status = TracedProcState.MEMORY_ERROR
 
     @property
     def stdout(self):
@@ -170,7 +175,7 @@ class ProcessTracer:
         Returns:
           str: The stdout data of the process.
         """
-        return self.stdout_data
+        return self._stdout_data
 
     @property
     def stderr(self):
@@ -180,7 +185,7 @@ class ProcessTracer:
         Returns:
             str: The stderr data.
         """
-        return self.stderr_data
+        return self._stderr_data
 
     @property
     def status(self):
@@ -190,7 +195,7 @@ class ProcessTracer:
         Returns:
             TracedProcState: The status of the process.
         """
-        return self.status
+        return self._status
 
     @property
     def exitcode(self):
@@ -200,4 +205,26 @@ class ProcessTracer:
         Returns:
             int: The exit code of the process.
         """
-        return self.exitcode
+        return self._exitcode
+
+    @property
+    def exec_time_ms(self):
+        """
+        Returns the execution time of the process in milliseconds.
+
+        Returns:
+            float: The execution time of the process in milliseconds.
+        """
+        return self._exec_time_ms
+
+    @property
+    def max_memory_used_mb(self):
+        """
+        Returns the maximum memory used by the process in megabytes.
+
+        Returns:
+            float: The maximum memory used by the process in megabytes.
+        """
+        return self._max_memory_used_mb
+
+    

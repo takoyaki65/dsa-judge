@@ -1,7 +1,7 @@
 # usage: python3 ProcessTracerCmd.py <timeout_ms> <max_memory_mb> <path_to_executable> <args>
 
 import sys
-from . import ProcessTracer
+from sandbox import ProcessTracer
 import subprocess
 
 if __name__ == "__main__":
@@ -18,15 +18,15 @@ if __name__ == "__main__":
     try:
         tracer.spawn()
         print(f"Status: {tracer.status}")
-        print(f"Stdout: {tracer.stdout_data}")
-        print(f"Stderr: {tracer.stderr_data}")
+        print(f"Stdout: {tracer.stdout}")
+        print(f"Stderr: {tracer.stderr}")
         print(f"Executed in {tracer.exec_time_ms} ms")
         print(f"Memory used: {tracer.max_memory_used_mb} MB")
     except (TimeoutError, MemoryError, subprocess.CalledProcessError) as e:
         print(f"Status: {tracer.status}")
         print(f"Error: {str(e)}")
-        print(f"Stdout: {tracer.stdout_data}")
-        print(f"Stderr: {tracer.stderr_data}")
+        print(f"Stdout: {tracer.stdout}")
+        print(f"Stderr: {tracer.stderr}")
         print(f"Executed in {tracer.exec_time_ms} ms")
         print(f"Memory used: {tracer.max_memory_used_mb} MB")
 

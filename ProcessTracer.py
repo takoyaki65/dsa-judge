@@ -4,7 +4,20 @@ import resource
 from enum import Enum
 import psutil
 
+
 class TracedProcState(Enum):
+    """
+    Represents the state of a traced process.
+
+    Attributes:
+        NOT_STARTED (int): The process has not started yet.
+        RUNNING (int): The process is currently running.
+        SUCCESS (int): The process completed successfully.
+        TIMEOUT (int): The process exceeded the timeout limit.
+        MEMORY_ERROR (int): The process exceeded the memory limit.
+        EXEC_ERROR (int): The process returned a non-zero exit code.
+    """
+
     NOT_STARTED = 0
     RUNNING = 1
     SUCCESS = 2
@@ -14,6 +27,23 @@ class TracedProcState(Enum):
 
 
 class ProcessTracer:
+    """
+    A class for tracing and monitoring the execution of a process.
+
+    Attributes:
+        timeout_ms (int): The timeout value in milliseconds.
+        max_memory_mb (int): The maximum memory limit in megabytes.
+        stdout_data (str): The stdout data of the process.
+        stderr_data (str): The stderr data of the process.
+        exec_time_ms (int): The execution time of the process in milliseconds.
+        max_memory_used_mb (int): The maximum memory used by the process in megabytes.
+        pathname (str): The path to the executable file.
+        args (list[str]): The command-line arguments for the process.
+        process (psutil.Popen): The process object representing the running process.
+        status (TracedProcState): The current status of the process.
+        exitcode (int): The exit code of the process.
+    """
+
     timeout_ms: int = 1000
     max_memory_mb: int = 100
     stdout_data: str = b""
@@ -33,6 +63,15 @@ class ProcessTracer:
         timeout_ms: int = 1000,
         max_memory_mb: int = 100,
     ):
+        """
+        Initializes a new ProcessTracer object.
+
+        Args:
+            pathname (str): The path to the executable file.
+            args (list[str]): The command-line arguments for the process.
+            timeout_ms (int): The timeout value in milliseconds (default: 1000).
+            max_memory_mb (int): The maximum memory limit in megabytes (default: 100).
+        """
         self.pathname = pathname
         self.args = args
         self.timeout_ms = timeout_ms
@@ -105,7 +144,7 @@ class ProcessTracer:
             )
             self.stdout_data, self.stderr_data = self.process.communicate()
             self.exec_time_ms = (usage.ru_utime + usage.ru_stime) * 1000
-        
+
         except (TimeoutError, MemoryError):
             self.process.terminate()
             self.exitcode = self.process.wait()
@@ -142,3 +181,23 @@ class ProcessTracer:
             str: The stderr data.
         """
         return self.stderr_data
+
+    @property
+    def status(self):
+        """
+        Returns the status of the process.
+
+        Returns:
+            TracedProcState: The status of the process.
+        """
+        return self.status
+
+    @property
+    def exitcode(self):
+        """
+        Returns the exit code of the process.
+
+        Returns:
+            int: The exit code of the process.
+        """
+        return self.exitcode

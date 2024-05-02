@@ -101,67 +101,55 @@ class ProcessTracer:
         # print(f"pathname: {self._pathname}")
         # print(f"args: {self._args}")
         self._process = psutil.Popen(
-            [self._pathname] + self._args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            [self._pathname] + self._args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
         self._status = TracedProcState.RUNNING
 
-        try:
-            while self._process.is_running():
-                try:
-                    # print("Waiting for process to finish")
-                    self._exitcode = self._process.wait(timeout=self._timeout_ms / 10.0)
-                    # If TimoutExpired is not raised, the process has finished
-                    break
-                except psutil.TimeoutExpired:
-                    # print("Process is still running")
-                    pass
+        while self._process.is_running():
+            try:
+                # print("Waiting for process to finish")
+                self._exitcode = self._process.wait(timeout=self._timeout_ms / 10.0)
+                # If TimoutExpired is not raised, the process has finished
+                break
+            except psutil.TimeoutExpired:
+                # print("Process is still running")
+                pass
 
-                # Check timeout
-                cpu_times = self._process.cpu_times()
-                self._exec_time_ms = (
-                    cpu_times.user + cpu_times.system + cpu_times.iowait  # in seconds
-                ) * 1000  # in milliseconds
-                # print(f"Execution time: {self.exec_time_ms}")
-                if self._exec_time_ms > self._timeout_ms:
-                    self._process.terminate()
-                    self._status = TracedProcState.TIMEOUT
-                    raise TimeoutError(
-                        f"Process exceeded timeout of {self._timeout_ms} ms"
-                    )
+            # Check timeout
+            cpu_times = self._process.cpu_times()
+            self._exec_time_ms = (
+                cpu_times.user + cpu_times.system + cpu_times.iowait  # in seconds
+            ) * 1000  # in milliseconds
+            # print(f"Execution time: {self.exec_time_ms}")
+            if self._exec_time_ms > self._timeout_ms:
+                self._process.terminate()
+                self._exitcode = self._process.wait()
+                self._status = TracedProcState.TIMEOUT
+                break
 
-                # Check memory usage
-                memory_info: psutil.Process.memory_info = self._process.memory_info()
-                memory_used_mb: float = memory_info.rss / 1024.0 / 1024.0
-                self._max_memory_used_mb = max(memory_used_mb, self._max_memory_used_mb)
-                # print(f"Memory used: {self.max_memory_used_mb}")
-                if self._max_memory_used_mb > self._max_memory_mb:
-                    self._process.terminate()
-                    self._status = TracedProcState.MEMORY_ERROR
-                    raise MemoryError(
-                        f"Process exceeded memory limit of {self._max_memory_mb} MB"
-                    )
+            # Check memory usage
+            memory_info: psutil.Process.memory_info = self._process.memory_info()
+            memory_used_mb: float = memory_info.rss / 1024.0 / 1024.0
+            self._max_memory_used_mb = max(memory_used_mb, self._max_memory_used_mb)
+            # print(f"Memory used: {self.max_memory_used_mb}")
+            if self._max_memory_used_mb > self._max_memory_mb:
+                self._process.terminate()
+                self.exitcode = self._process.wait()
+                self._status = TracedProcState.MEMORY_ERROR
+                break
 
-            usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-            self._max_memory_used_mb = max(
-                self._max_memory_used_mb, usage.ru_maxrss / 1024.0
-            )
-            self._stdout_data, self._stderr_data = self._process.communicate()
-            self._exec_time_ms = (usage.ru_utime + usage.ru_stime) * 1000
-
-        except (TimeoutError, MemoryError):
-            self._process.terminate()
-            self._exitcode = self._process.wait()
-            self._stdout_data, self._stderr_data = self._process.communicate()
-            raise
+        usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+        self._max_memory_used_mb = max(
+            self._max_memory_used_mb, usage.ru_maxrss / 1024.0
+        )
+        self._stdout_data, self._stderr_data = self._process.communicate()
+        self._exec_time_ms = (usage.ru_utime + usage.ru_stime) * 1000
 
         if self._exitcode != 0:
             self._status = TracedProcState.EXEC_ERROR
-            raise subprocess.CalledProcessError(
-                self._exitcode,
-                self._pathname,
-                output=self._stdout_data,
-                stderr=self._stderr_data,
-            )
+
         if self._exitcode == 0:
             self._status = TracedProcState.SUCCESS
             if self._max_memory_used_mb > self._max_memory_mb:
@@ -226,5 +214,3 @@ class ProcessTracer:
             float: The maximum memory used by the process in megabytes.
         """
         return self._max_memory_used_mb
-
-    

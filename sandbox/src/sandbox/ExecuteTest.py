@@ -159,6 +159,7 @@ def main():
                 "status": exec_status,
                 "time": exec_result.get("time_ms"),
                 "memory": exec_result.get("memory_mb"),
+                "stdin": open(input_file, "r", encoding="utf8").read(),
                 "stdout": stdout_data,
                 "stderr": stderr_data,
                 "expected_stdout": expected_stdout,
@@ -166,5 +167,38 @@ def main():
             })
         
         all_tests_results.append(one_test_results)
+    
+    # コンテナを削除
+    container.stop()
+    container.remove()
 
+    # sandboxディレクトリを削除
     temp_dir.cleanup()
+
+    # 結果をまとめる。
+    # まとめる対象: 
+    # compile_logs: list
+    # all_tests_results: list
+    # 結果の形式:
+    # [
+    #     {
+    #         "name": "insert_test",
+    #         "status": "AC",
+    #         "time": 0.759,
+    #         "memory": 13.24522,
+    #         "compile_command": "......",
+    #         "compile_warnings": ".....",
+    #         "detail": [
+    #             {
+    #                 "status": "AC",
+    #                 "time": 0.759,
+    #                 "memory": 13.24522,
+    #                 "stdin": ".....",
+    #                 "stdout": ".....",
+    #                 "stderr": ".....",
+    #                 "expected_stdout": ".....",
+    #                 "expected_stderr": "....."
+    #             },
+    #         ]
+    #     },
+    # ]
